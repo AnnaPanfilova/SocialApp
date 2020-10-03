@@ -21,6 +21,8 @@ class LoginFormViewController: UIViewController {
         // Присваиваем его UIScrollVIew
         scrollView?.addGestureRecognizer(hideKeyboardGesture)
         
+        loginInput.delegate = self
+        passwordInput.delegate = self
     }
     
     @IBAction func loginButtonPress(_ sender: Any) {
@@ -32,11 +34,50 @@ class LoginFormViewController: UIViewController {
         // Проверяем, верны ли они
         if login == "admin" && password == "123456" {
             print("успешная авторизация")
+            performSegue(withIdentifier: "goNext", sender: self)
         } else {
             print("неуспешная авторизация")
         }
     }
     
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        return tryLogin()
+    }
+    
+    func tryLogin() -> Bool {
+        let checkResult = checkUserData()
+        
+        // Если данные не верны, покажем ошибку
+        if !checkResult {
+            showLoginError()
+        }
+        
+        // Вернем результат
+        return checkResult
+    }
+    
+    func checkUserData() -> Bool {
+        guard let login = loginInput.text,
+            let password = passwordInput.text else { return false }
+        
+        if login == "admin" && password == "123456" {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func showLoginError() {
+        // Создаем контроллер
+        let alter = UIAlertController(title: "Ошибка", message: "Введены не верные данные пользователя", preferredStyle: .alert)
+        // Создаем кнопку для UIAlertController
+        let action = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        // Добавляем кнопку на UIAlertController
+        alter.addAction(action)
+        // Показываем UIAlertController
+        present(alter, animated: true, completion: nil)
+    }
+
     // Когда клавиатура появляется
     @objc func keyboardWasShown(notification: Notification) {
         
@@ -78,5 +119,21 @@ class LoginFormViewController: UIViewController {
     }
     
     
+    
+}
+
+extension LoginFormViewController: UITextFieldDelegate {
+   
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == loginInput {
+            passwordInput.becomeFirstResponder()
+        } else {
+            if tryLogin() {
+                performSegue(withIdentifier: "goNext", sender: self)
+            }
+        }
+        
+        return true
+    }
     
 }
