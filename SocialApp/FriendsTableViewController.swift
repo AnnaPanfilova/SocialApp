@@ -67,7 +67,7 @@ class FriendsTableViewController: UITableViewController {
             
             cell.nameLabel.text = friend.name
             cell.ageLabel.text = String(friend.age)
-            cell.avatarImageView.image = friend.avatar
+            cell.avatarView.imageView.image = friend.avatar
             cell.tag = indexPath.row
         }
 
